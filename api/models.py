@@ -1,0 +1,26 @@
+# api/models.py
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+import datetime
+
+Base = declarative_base()
+
+class Product(Base):
+    __tablename__ = "products"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    url = Column(String, unique=True, index=True)
+
+    prices = relationship("PriceHistory", back_populates="product", cascade="all, delete-orphan")
+
+class PriceHistory(Base):
+    __tablename__ = "price_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, ForeignKey("products.id"))
+    price = Column(Float)
+    scraped_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    product = relationship("Product", back_populates="prices")
